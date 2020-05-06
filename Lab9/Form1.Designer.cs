@@ -56,7 +56,7 @@
             this.textBox3.Name = "textBox3";
             this.textBox3.ReadOnly = true;
             this.textBox3.Size = new System.Drawing.Size(122, 59);
-            this.textBox3.TabIndex = 3;
+            this.textBox3.TabIndex = 4;
             this.textBox3.Text = "Сорость заполнения квадрата точками, мс";
             // 
             // textBox1
@@ -142,7 +142,7 @@
             this.textBox_Speed.Location = new System.Drawing.Point(131, 137);
             this.textBox_Speed.Name = "textBox_Speed";
             this.textBox_Speed.Size = new System.Drawing.Size(123, 20);
-            this.textBox_Speed.TabIndex = 11;
+            this.textBox_Speed.TabIndex = 3;
             // 
             // textBox_NumOfThreads
             // 
@@ -150,7 +150,7 @@
             this.textBox_NumOfThreads.Location = new System.Drawing.Point(131, 70);
             this.textBox_NumOfThreads.Name = "textBox_NumOfThreads";
             this.textBox_NumOfThreads.Size = new System.Drawing.Size(123, 20);
-            this.textBox_NumOfThreads.TabIndex = 10;
+            this.textBox_NumOfThreads.TabIndex = 2;
             // 
             // textBox_Radius
             // 
@@ -158,7 +158,7 @@
             this.textBox_Radius.Location = new System.Drawing.Point(131, 3);
             this.textBox_Radius.Name = "textBox_Radius";
             this.textBox_Radius.Size = new System.Drawing.Size(123, 20);
-            this.textBox_Radius.TabIndex = 9;
+            this.textBox_Radius.TabIndex = 1;
             // 
             // textBox_ResultMK
             // 
@@ -225,10 +225,11 @@
             this.Controls.Add(this.tableLayoutPanel2);
             this.MaximizeBox = false;
             this.MaximumSize = new System.Drawing.Size(675, 425);
-            this.MinimumSize = new System.Drawing.Size(500, 300);
+            this.MinimizeBox = false;
+            this.MinimumSize = new System.Drawing.Size(675, 425);
             this.Name = "MainForm";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-            this.Text = "Находждение площади круга методом Монте-Карло";
+            this.Text = "Нахождение площади круга методом Монте-Карло";
             this.tableLayoutPanel1.ResumeLayout(false);
             this.tableLayoutPanel1.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();

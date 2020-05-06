@@ -8,6 +8,8 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
+using System.Threading;
+
 namespace Lab9
 {
     public partial class MainForm : Form
@@ -18,9 +20,10 @@ namespace Lab9
         List<Color> Colors = new List<Color>();
         int X;//коодринаты левого верхнего угла квадрата
         int Y;
-        double res = 0;
-        int CountRect=0;
-        int CountCrc=0;
+        double res = 0;//методом МК
+        double prRes = 0;//по обычной формуле
+        int CountRect=0;//количество точек в квадрате
+        int CountCrc=0;//количество точек в круге
         public MainForm()
         {
             InitializeComponent();
@@ -29,62 +32,54 @@ namespace Lab9
         private void button_Start_Click(object sender, EventArgs e)
         {
             if (CheckFields()) {
+                prRes = Math.Round((Math.PI * Radius * Radius), 0);
+                res = 0;
+                textBox_ResultPR.Text = prRes.ToString();
+                Colors.Clear();
 
                 PaintRectEllp();
-                //func();
-                Task[] tasks = new Task[NumOfThreads];
 
-                Random rnd = new Random();
-                for (int i = 0; i < tasks.Length; i++)
-                {
-                    Colors.Add(Color.FromArgb(rnd.Next(256), rnd.Next(256), rnd.Next(256)));
-                    tasks[i] = Task.Run(() => Actions(i));
-                    //tasks[i].Wait();
-                    textBox_ResultMK.Text = res.ToString();
-                }
-
-                //Colors.Add(Color.Blue);
-                //while (true)
-                //{
-                //    var NewTask = Task.Run(() => Actions(0));
-                //    NewTask.Wait();
-                //}
-
-
-                //var NewTask2 = Task.Run(() => Actions());
-                //var NewTask=Task.Factory.StartNew(Actions);
-                // var NewTask2 = Task.Factory.StartNew(Actions);
+                 Async_func();
             }
         }
-        public async Task func() {           
+
+        public async Task Async_func() {
+            Task[] tasks = new Task[NumOfThreads];
+
+            Random rnd = new Random();
+            for (int i = 0; i < tasks.Length; i++)
+            {
+                Colors.Add(Color.FromArgb(rnd.Next(256), rnd.Next(256), rnd.Next(256)));
+
+                tasks[i] = await Task.Run(async () => Actions(i));
+            }
         }
+
         public async Task Actions(int i) {
-           
-
             Random rand = new Random();
-            int x = rand.Next(X, X+2*Radius);
-            int y = rand.Next(Y, Y+2*Radius);
 
-            if ( ((X+Radius)-x)* ((X + Radius) - x)+ ((Y + Radius) - y) * ((Y + Radius) - y) <=Radius*Radius) {
-                CountCrc++;
+            while (Math.Abs(res - prRes) >= 40)
+            {          
+                int x = rand.Next(X, X+2*Radius);
+                int y = rand.Next(Y, Y+2*Radius);
+
+                if ( ((X+Radius)-x)* ((X + Radius) - x)+ ((Y + Radius) - y) * ((Y + Radius) - y) <=Radius*Radius) {
+                    Interlocked.Increment(ref CountCrc);
+                }
+                Interlocked.Increment(ref CountRect);
+
+                Brush b = new SolidBrush(Colors[i]);
+                PaintPoint(x,y,b);
+
+                int localres = (4*Radius * Radius * CountCrc / CountRect);
+                Interlocked.Exchange(ref res, localres);
+
+                textBox_ResultMK.Invoke(new Action (() => textBox_ResultMK.Text = res.ToString()));
+                //Thread.Sleep(Speed);              
+                //Task.Delay(Speed).Wait();
+                await Task.Delay(Speed);
             }
-            CountRect++;
-
-
-            Brush b = new SolidBrush(Colors[i]);
-            PaintPoint(x,y,b);
-
-            //MainForm.Invoke(()=>textBox_ResultMK.Text = "OK!");
-            //checkBox3.Invoke(new Action(() => checkBox3.Enabled = false));
-
-            res = (4*Radius * Radius * CountCrc / CountRect);
-            //textBox_ResultMK.Invoke(new Action (() => textBox_ResultMK.Text = res.ToString()));
-
-            await Task.Delay(Speed);//.ConfigureAwait(false); 
-           // Console.WriteLine( "sdf");
-            //await Task.WhenAll(t3);
         }
-
 
         private void PaintRectEllp() {
             Graphics g = pictureBox1.CreateGraphics();
@@ -101,14 +96,11 @@ namespace Lab9
             //g.FillRectangle(b2, r);
             b = new SolidBrush(Color.Red);/////////////
             p = new Pen(b, 3);
-            g.DrawEllipse(p, r);
-
-           
+            g.DrawEllipse(p, r);          
         }
 
         private void PaintPoint(int x, int y, Brush b)
         {
-            ///доб фигуру на форму
             Graphics g = pictureBox1.CreateGraphics();
 
             Pen p = new Pen(b);
@@ -116,9 +108,6 @@ namespace Lab9
             g.DrawRectangle(p, point);
             g.FillRectangle(b, point);
         }
-
-
-
 
         public bool CheckFields()
         {
@@ -130,7 +119,6 @@ namespace Lab9
                     MessageBox.Show("Радиус слишком большой или слишком маленький!");
                     return false;
                 }
-                textBox_ResultPR.Text = Math.Round((Math.PI * Radius * Radius),0).ToString();
             }
             else
             {
